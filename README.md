@@ -4,7 +4,7 @@ Waterfall effect use the UIScrollView immplement.
 detail in the code.
 
 ##中文解释
-瀑布流的UIScrollView 实现
+瀑布流的效果用UIScrollView 实现
 
 DDWaterfallView 是基于UIScrollView实现的瀑布流形式
 
