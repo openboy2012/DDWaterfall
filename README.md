@@ -1,7 +1,7 @@
 # DDWaterfall
 Waterfall effect use the UIScrollView immplement.
 
-you can use the WaterfallView like UITableView.
+you can use the DDWaterfallView like UITableView.
 
 detail in the code.
 
