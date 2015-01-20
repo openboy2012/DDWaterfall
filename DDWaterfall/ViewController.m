@@ -27,17 +27,18 @@
         dataList = [[NSMutableArray alloc] initWithCapacity:0];
     }
     
-    for (int i = 0; i < 20; ++i) {
-        [dataList addObject:@(i)];
-    }
-    
     self.waterfallView = [[DDWaterfallView alloc] initWithFrame:self.view.bounds];
     self.waterfallView.waterfallDelegate = self;
     self.waterfallView.waterfallDataSource = self;
     self.waterfallView.contentInset = UIEdgeInsetsMake(0.0, 10.0, 0.0, 10.0f);
     
     [self.view addSubview:self.waterfallView];
-    [self.waterfallView reloadData];
+    
+//    for (int i = 0; i < 20; ++i) {
+//        [dataList addObject:@(i)];
+//    }
+//    [self.waterfallView reloadData];
+    [self loadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -63,11 +64,11 @@
     if(!cell){
         cell = [[DDWaterfallCell alloc] initWithIdentifier:@"DemoCell"];
     }
-    cell.contentView.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0f green:arc4random()%255/255.0f blue:arc4random()%255/255.0f alpha:1.0f];
+//    cell.contentView.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0f green:arc4random()%255/255.0f blue:arc4random()%255/255.0f alpha:1.0f];
     cell.textLabel.text = [NSString stringWithFormat:@"#%@",dataList[indexPath.row * [waterfallView numberOfColumns] + indexPath.section]];
-    if(indexPath.row * [waterfallView numberOfColumns] + indexPath.section == 18){
-        cell.textLabel.text = nil;
-    }
+    cell.textLabel.textAlignment = NSTextAlignmentCenter;
+    cell.layer.borderColor = [UIColor blackColor].CGColor;
+    cell.layer.borderWidth = 1.0f/[UIScreen mainScreen].scale;
     return cell;
 }
 
@@ -78,7 +79,22 @@
 }
 
 - (CGFloat)waterfallView:(DDWaterfallView *)waterfallView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return arc4random() % 120 + 100.0f;
+    return 100.0f + [dataList[indexPath.row * [waterfallView numberOfColumns] + indexPath.section] floatValue];
+}
+
+- (void)loadingMoreInWaterfallView:(DDWaterfallView *)waterfallView{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,  NSEC_PER_SEC * 1.0f), dispatch_get_main_queue(), ^{
+        [self loadData];
+    });
+}
+
+- (void)loadData{
+    int countIndex = (int)dataList.count;
+    for (int i = countIndex; i < countIndex + 20; ++i) {
+        [dataList addObject:@(i)];
+    }
+    self.waterfallView.haveMore = YES;
+    [self.waterfallView reloadData];
 }
 
 @end

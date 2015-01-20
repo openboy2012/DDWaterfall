@@ -17,6 +17,7 @@
 
 @property (nonatomic, weak) IBOutlet id<DDWaterfallViewDataSource>  waterfallDataSource;
 @property (nonatomic, weak) IBOutlet id<DDWaterfallViewDelegate>  waterfallDelegate;
+@property (nonatomic) BOOL haveMore;
 
 - (instancetype)initWithFrame:(CGRect)frame;
 
@@ -131,6 +132,14 @@
  *  @return vertical spacing
  */
 - (CGFloat)verticalSpacingInWaterfallView:(DDWaterfallView *)waterfallView;
+
+
+/**
+ *  Loading More in waterfallView
+ *
+ *  @param waterfallView waterfallView
+ */
+- (void)loadingMoreInWaterfallView:(DDWaterfallView *)waterfallView;
 
 @end
 

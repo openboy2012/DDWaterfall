@@ -20,6 +20,10 @@
     BOOL isRegisterNib;
     UINib *regsiterNib;
     NSString *registerNibReuseIdentifier;
+    
+    UIActivityIndicatorView *loadingMoreIndicator;
+    
+    BOOL isLoading;
 }
 
 @property (nonatomic) NSInteger columns; // waterfall columns in current waterfallView
@@ -118,30 +122,19 @@
         [self.waterfallDelegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
         [(id<UIScrollViewDelegate>)self.waterfallDelegate scrollViewDidScroll:self];
     }
-}
-
-- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
-{
-    return YES;
-}
-
-- (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView
-{
-    ;
-}
-
-- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
-{
-    [self onScroll];
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-    ;
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-    ;
+    
+    float bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height;
+    
+    if (bottomEdge >= self.contentSize.height)
+    {
+        if (isLoading)
+            return;
+        isLoading = YES;
+        
+        if([self.waterfallDelegate respondsToSelector:@selector(loadingMoreInWaterfallView:)]){
+            [self.waterfallDelegate loadingMoreInWaterfallView:self];
+        }
+    }
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
@@ -152,20 +145,21 @@
     }
 }
 
-- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
-{
-    ;
-}
-
-- (void)scrollViewDidZoom:(UIScrollView *)scrollView
-{
-    ;
-}
-
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
-{
-    ;
-}
+//- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+//{
+//    float bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height;
+//    
+//    if (bottomEdge == self.contentSize.height)
+//    {
+//        if (isLoading)
+//            return;
+//        isLoading = YES;
+//        
+//        if([self.waterfallDelegate respondsToSelector:@selector(loadingMoreInWaterfallView:)]){
+//            [self.waterfallDelegate loadingMoreInWaterfallView:self];
+//        }
+//    }
+//}
 
 #pragma mark - UIGestureRecognizer Delegate Methods
 
@@ -183,9 +177,6 @@
     isRegisterNib = YES;
     regsiterNib = nib;
     registerNibReuseIdentifier = identifier;
-//    [cell.layer setValue:identifier forKey:@"reuseKey"];
-//    [cell prepareForReuse];
-//    [self addReusableCell:cell];
 }
 
 - (void)reloadData
@@ -204,6 +195,8 @@
             }
         }
     }
+    
+    isLoading = NO;
     
     [self initialize];
 }
@@ -287,6 +280,19 @@
     
     self.contentSize = CGSizeMake(self.frame.size.width - self.contentInset.left - self.contentInset.right, scrollHeight);
     
+    if(self.haveMore){
+        self.contentSize = CGSizeMake(self.contentSize.width, self.contentSize.height + 44.0f);
+        if(!loadingMoreIndicator)
+            loadingMoreIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0.0, 0.0, 20.0, 20.0f)];
+        loadingMoreIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        [loadingMoreIndicator startAnimating];
+        loadingMoreIndicator.center = CGPointMake(self.center.x, self.contentSize.height - 22.0f);
+        [self addSubview:loadingMoreIndicator];
+    }else{
+        [loadingMoreIndicator removeFromSuperview];
+        loadingMoreIndicator = nil;
+    }
+
     [self onScroll];
 }
 
